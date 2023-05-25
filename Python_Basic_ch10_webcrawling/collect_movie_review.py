@@ -9,13 +9,11 @@ import time
 import re
 import math
 
-
 # anaconda prompt
 # > conda activate cnu_python
 # > pip install beautifulSoup
 # > pip install selenium
 # > pip install webdriver_manager
-
 
 #######################################
 # 1. Install ChromeDriver for selenium#
@@ -23,7 +21,6 @@ import math
 # 1. 최신버전 사용해서 code로  다운로드(최신버전)
 # 2. chrome driver 다운로드 후 주입(구버전)
 # 주소 : https://sites.google.com/chromium.org/driver/
-
 
 driver = Service(executable_path="../driver/chromedriver.exe")
 options = Options()
@@ -74,14 +71,33 @@ review_html = driver.page_source
 doc = BeautifulSoup(review_html,"html.parser")
 review_list = doc.select("ul.list_comment div.cmt_info")
 
-for review_box in review_list:
+empty_cnt = 0
+empty_list = []
+for i, review_box in enumerate(review_list):
+    if len(review_box.select("p.desc_txt")) == 0:
+        empty_cnt += 1  # empty review cnt+1
+        empty_list.append(i+1)  # empty review number
+    else:
+        review = review_box.select("p.desc_txt")[0].text.strip()
     score = review_box.select("div.ratings")[0].text
-    writer = review_box.select("")
-    review_date = review_box.select("")
-    review =review_box.select("")
+    writer = review_box.select("a.link_nick > span")[1].text
+    review_date = review_box.select("span.txt_date")[0].text
+    print(f"={i+1}=======================================================")
+    print(f"-리뷰:{review}")
     print(f"-평점:{score}")
-    # 숙제 : 리뷰, 작성자, 작성일자 수집!
+    print(f"-작성자:{writer}")
+    print(f"-일자:{review_date}")
 
+# Report
+print("=" * 30)
+print(f"# MOVIE TITLE : {title}")
+print("#" * 30)
+print(f"  - Total Review : {total_review}")
+print(f"  - Empty Review : {empty_cnt}")
+if len(empty_list) > 0:
+    print(f"    + {empty_list}")
+print(f"  - Reviews collected : {total_review - empty_cnt}")
+print("#" * 30)
 
 
 
